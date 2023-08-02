@@ -1,0 +1,1 @@
+/usr/bin/g++ -fPIC  -shared -Wl,-soname,libmyplugins.so -o libmyplugins.so CMakeFiles/myplugins.dir/plugin/yololayer.cu.o  -lnvinfer -lcudart  -L"/usr/local/cuda/targets/x86_64-linux/lib/stubs" -L"/usr/local/cuda/targets/x86_64-linux/lib" -lcudadevrt -lcudart_static -lrt -lpthread -ldl
