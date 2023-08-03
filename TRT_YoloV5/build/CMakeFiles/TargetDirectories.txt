@@ -1,0 +1,5 @@
+/home/liujinfu/Desktop/TRT_YoloV5/build/CMakeFiles/rebuild_cache.dir
+/home/liujinfu/Desktop/TRT_YoloV5/build/CMakeFiles/edit_cache.dir
+/home/liujinfu/Desktop/TRT_YoloV5/build/CMakeFiles/yolov5_seg.dir
+/home/liujinfu/Desktop/TRT_YoloV5/build/CMakeFiles/yolov5_det.dir
+/home/liujinfu/Desktop/TRT_YoloV5/build/CMakeFiles/myplugins.dir
