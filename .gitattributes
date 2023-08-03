@@ -1,0 +1,2 @@
+*.py linguist-language=C++
+*.yaml linguist-language=C++
