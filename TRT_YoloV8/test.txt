@@ -1,3 +1,4 @@
 ./yolov8 -s ../yolov8/weights/yolov8s.wts ./yolov8s.engine s
 ./yolov8 -d ./yolov8s.engine -i ../images g
 ./yolov8 -d ./yolov8s.engine -v ../videos/test1.avi g
+./yolov8 -d ./yolov8s.engine -c 0 g
