@@ -224,7 +224,7 @@ int main(int argc, char **argv) {
             cv::Size(video.get(cv::CAP_PROP_FRAME_WIDTH), 
                 video.get(cv::CAP_PROP_FRAME_HEIGHT))
         );
-\
+
         for (size_t i = 0; i < video.get(cv::CAP_PROP_FRAME_COUNT); i += kBatchSize) {
             // Get a batch of frames
             std::vector<cv::Mat> img_batch;
@@ -251,6 +251,53 @@ int main(int argc, char **argv) {
             for (size_t j = 0; j < img_batch.size(); j++) {
                 vw.write(img_batch[j]);;
             }
+        }
+    }
+
+    else if(input_type == "-c"){
+        cv::VideoCapture cam(std::stoi(input_dir));
+        int fps = cam.get(cv::CAP_PROP_FPS); // 获取原视频的帧率
+
+        if (!cam.isOpened()){
+            std::cout << "cam open failed!" << std::endl;
+            getchar();
+            return -1;
+        }
+
+        // save video
+        cv::VideoWriter vw;
+        vw.open("./_output.avi",
+            cv::VideoWriter::fourcc('X', '2', '6', '4'),
+            fps,
+            cv::Size(cam.get(cv::CAP_PROP_FRAME_WIDTH), 
+            cam.get(cv::CAP_PROP_FRAME_HEIGHT))
+        );
+
+        while(cv::waitKey(5) != 'q') {
+            // Get a batch of frames
+            std::vector<cv::Mat> img_batch;
+            cv::Mat img;
+            if(!cam.read(img)) break; // read frame
+            img_batch.push_back(img);
+
+            // Preprocess
+            cuda_batch_preprocess(img_batch, device_buffers[0], kInputW, kInputH, stream);
+            // Run inference
+            infer(*context, stream, (void **)device_buffers, output_buffer_host, kBatchSize, decode_ptr_host, decode_ptr_device, model_bboxes, cuda_post_process);
+            std::vector<std::vector<Detection>> res_batch;
+            if (cuda_post_process == "c") {
+                // NMS
+                batch_nms(res_batch, output_buffer_host, img_batch.size(), kOutputSize, kConfThresh, kNmsThresh);
+            } else if (cuda_post_process == "g") {
+                //Process gpu decode and nms results
+                batch_process(res_batch, decode_ptr_host, img_batch.size(), bbox_element, img_batch);
+            }
+            // Draw bounding boxes
+            draw_bbox(img_batch, res_batch); 
+            // show frame 
+            imshow("cam", img_batch[0]); 
+            if (cv::waitKey(5) == 'q') break; 
+            vw.write(img_batch[0]);;
         }
     }
 
