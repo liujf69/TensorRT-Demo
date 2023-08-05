@@ -229,6 +229,7 @@ int main(int argc, char** argv) {
       }
     }
   }
+
   else if(input_type == "-v"){
     // read video
     cv::VideoCapture video;
@@ -273,8 +274,57 @@ int main(int argc, char** argv) {
         cv::Mat img = img_batch[b];
         auto masks = process_mask(&cpu_output_buffer2[b * kOutputSize2], kOutputSize2, res);
         draw_mask_bbox(img, res, masks, labels_map);
-        vw.write(img);;
+        vw.write(img);
       }
+    }
+  }
+
+  else if(input_type == "-c"){
+    cv::VideoCapture cam(std::stoi(input_dir));
+    if (!cam.isOpened()){
+        std::cout << "cam open failed!" << std::endl;
+        getchar();
+        return -1;
+    }
+
+    // save video
+    cv::VideoWriter vw;
+    vw.open("./seg_output.avi",
+        cv::VideoWriter::fourcc('X', '2', '6', '4'),
+        cam.get(cv::CAP_PROP_FPS),
+        cv::Size(cam.get(cv::CAP_PROP_FRAME_WIDTH), 
+        cam.get(cv::CAP_PROP_FRAME_HEIGHT))
+    );
+
+    while(cv::waitKey(5) != 'q') {
+        // Get a batch of frames
+        std::vector<cv::Mat> img_batch;
+        cv::Mat img;
+        if(!cam.read(img)) break; // read frame
+        img_batch.push_back(img);
+
+        // Preprocess
+        cuda_batch_preprocess(img_batch, gpu_buffers[0], kInputW, kInputH, stream);
+
+        // Run inference
+        auto start = std::chrono::system_clock::now();
+        infer(*context, stream, (void**)gpu_buffers, cpu_output_buffer1, cpu_output_buffer2, kBatchSize);
+        auto end = std::chrono::system_clock::now();
+        std::cout << "inference time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms" << std::endl;
+
+        // NMS
+        std::vector<std::vector<Detection>> res_batch;
+        batch_nms(res_batch, cpu_output_buffer1, img_batch.size(), kOutputSize1, kConfThresh, kNmsThresh);
+
+        // Draw result and save image
+        for (size_t b = 0; b < img_batch.size(); b++) {
+          auto& res = res_batch[b];
+          cv::Mat img = img_batch[b];
+          auto masks = process_mask(&cpu_output_buffer2[b * kOutputSize2], kOutputSize2, res);
+          draw_mask_bbox(img, res, masks, labels_map);
+          vw.write(img);
+          cv::imshow("cam", img);  
+        }
     }
   }
 
