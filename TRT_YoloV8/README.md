@@ -15,6 +15,7 @@ make ..
 1. Serialize model to generate the engine file, run ```./yolov8 -s ../yolov8/weights/yolov8s.wts ./yolov8s.engine s```<br />
 2. Infer images, run ```./yolov8 -d ./yolov8s.engine -i ../images g```<br />
 3. Infer video, run ```./yolov8 -d ./yolov8s.engine -v ../videos/test1.avi g```<br />
+4. Infer camera, run ```./yolov8 -d ./yolov8s.engine -c 0 g```<br />
 ![image](https://github.com/liujf69/TensorRT-Demo/blob/master/TRT_YoloV8/build/_test1.jpg)
 
 # Reference
