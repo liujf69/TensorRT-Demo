@@ -17,7 +17,7 @@ make
 2. Infer images, run ```./yolov5_det -d yolov5s.engine -i ../images/test1.jpg```<br />
 3. Infer video, run ```./yolov5_det -d yolov5s.engine -v ../videos/test1.avi```<br />
 4. Infer camera, run ```./yolov5_det -d yolov5s.engine -c 0```<br />
-![image](https://github.com/liujf69/TensorRT-Demo/blob/master/TRT_YoloV5/build/det_test1.jpg)
+![image](https://github.com/liujf69/TensorRT-Demo/blob/master/TRT_YoloV5/images/det_output.jpg)
 
 ## Segmentation
 1. Serialize model to generate the engine file, run ```./yolov5_seg -s ../yolov5/weights/yolov5s-seg.wts ./yolov5s-seg.engine s```<br />
