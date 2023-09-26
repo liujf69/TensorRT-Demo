@@ -22,7 +22,7 @@ make
 ## Segmentation
 1. Serialize model to generate the engine file, run ```./yolov5_seg -s ../yolov5/weights/yolov5s-seg.wts ./yolov5s-seg.engine s```<br />
 2. Run ```wget -O coco.txt https://raw.githubusercontent.com/amikelive/coco-labels/master/coco-labels-2014_2017.txt``` <br />
-3. Infer images, run ```./yolov5_seg -d yolov5s-seg.engine -i ../images coco.txt```<br />
+3. Infer images, run ```./yolov5_seg -d yolov5s-seg.engine -i ../images/test1.jpg coco.txt```<br />
 4. Infer video, run ```./yolov5_seg -d yolov5s-seg.engine -v ../videos/test1.avi coco.txt```<br />
 5. Infer camera, run ```./yolov5_seg -d yolov5s-seg.engine -c 0 coco.txt```<br />
 ![image](https://github.com/liujf69/TensorRT-Demo/blob/master/TRT_YoloV5/images/seg_output.jpg)
