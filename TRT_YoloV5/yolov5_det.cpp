@@ -1,6 +1,6 @@
 /*
     ./yolov5_det -s ../yolov5/weights/yolov5s.wts ./yolov5s.engine s
-    ./yolov5_det -d yolov5s.engine -i ../images/test1.jpg
+    ./yolov5_det -d yolov5s.engine -i ../images
     ./yolov5_det -d yolov5s.engine -v ../videos/test1.avi
     ./yolov5_det -d yolov5s.engine -c 0
 */
@@ -82,6 +82,8 @@ public:
     void infer_video(std::string img_path);
     // 推理相机
     void infer_camera(int idx);
+    // 析构
+    ~Yolov5_det();
 
 private:
     cudaStream_t stream; // 创建流
@@ -258,6 +260,20 @@ void Yolov5_det::infer_camera(int idx){
         if(cv::waitKey(5) == 'q') break; 
         vw.write(img); 
     }
+
+}
+
+Yolov5_det::~Yolov5_det(){
+    // 释放stream和内存
+    cudaStreamDestroy(this->stream);
+    CUDA_CHECK(cudaFree(this->gpu_buffers[0]));
+    CUDA_CHECK(cudaFree(this->gpu_buffers[1]));
+    delete[] this->cpu_output_buffer;
+    cuda_preprocess_destroy();
+    // 释放engine
+    this->context->destroy();
+    this->engine->destroy();
+    this->runtime->destroy();
 }
 
 int main(int argc, char** argv){
