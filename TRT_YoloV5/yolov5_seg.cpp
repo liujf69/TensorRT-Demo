@@ -284,9 +284,9 @@ void Yolov5_seg::infer_camera(int idx){
 Yolov5_seg::~Yolov5_seg(){
     // 释放流和内存
     cudaStreamDestroy(this->stream);
-    CUDA_CHECK(cudaFree(this->gpu_buffers[0]));
-    CUDA_CHECK(cudaFree(this->gpu_buffers[1]));
-    CUDA_CHECK(cudaFree(this->gpu_buffers[2]));
+    cudaFree(this->gpu_buffers[0]);
+    cudaFree(this->gpu_buffers[1]);
+    cudaFree(this->gpu_buffers[2]);
     delete[] this->cpu_output_buffer1;
     delete[] this->cpu_output_buffer2;
     cuda_preprocess_destroy();
