@@ -8,7 +8,7 @@
 mkdir build
 cd build
 cmake .. # you should modify the CMakeListst.txt to set dependencies (i.e. TensorRT, OpenCV ..)
-make ..
+make
 ```
 
 # Test
