@@ -1,7 +1,11 @@
 # Download Weights
 1. Download weights (i.e. YOLOv8s, YOLOv8s-seg, ..) from [ultralytics](https://github.com/ultralytics/yolov5). <br />
 2. ```cd yolov5``` and put weights into the weights folder. <br />
-3. Run ```python gen_wts.py -w ./weights/yolov5s.pt -o ./weights/yolov5s.wts``` to get ```.wts``` weight file.
+3. Run the following command to get ```.wts``` weight file.
+```
+python gen_wts.py -w ./weights/yolov5s.pt -o ./weights/yolov5s.wts
+python gen_wts.py -w ./weights/yolov5s-seg.pt -o ./weights/yolov5s-seg.wts
+```
 
 # Compile
 ```
