@@ -1,6 +1,6 @@
 # Det
 ./yolov5_det -s ../yolov5/weights/yolov5s.wts ./yolov5s.engine s
-./yolov5_det -d yolov5s.engine -i ../images
+./yolov5_det -d yolov5s.engine -i ../images/test1.jpg
 ./yolov5_det -d yolov5s.engine -v ../videos/test1.avi
 ./yolov5_det -d yolov5s.engine -c 0
 
