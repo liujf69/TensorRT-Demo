@@ -79,7 +79,7 @@ void batch_nms(std::vector<std::vector<Detection>>& res_batch, float *output, in
   }
 }
 
-void draw_bbox(std::vector<cv::Mat>& img_batch, std::vector<std::vector<Detection>>& res_batch) {
+void draw_batch_bbox(std::vector<cv::Mat>& img_batch, std::vector<std::vector<Detection>>& res_batch) {
   for (size_t i = 0; i < img_batch.size(); i++) {
     auto& res = res_batch[i];
     cv::Mat img = img_batch[i];
@@ -89,6 +89,15 @@ void draw_bbox(std::vector<cv::Mat>& img_batch, std::vector<std::vector<Detectio
       cv::putText(img, std::to_string((int)res[j].class_id), cv::Point(r.x, r.y - 1), cv::FONT_HERSHEY_PLAIN, 1.2, cv::Scalar(0xFF, 0xFF, 0xFF), 2);
     }
   }
+}
+
+void draw_bbox(cv::Mat& image, std::vector<Detection>& res) {
+    cv::Mat img = image;
+    for (size_t j = 0; j < res.size(); j++) {
+      cv::Rect r = get_rect(img, res[j].bbox);
+      cv::rectangle(img, r, cv::Scalar(0x27, 0xC1, 0x36), 2);
+      cv::putText(img, std::to_string((int)res[j].class_id), cv::Point(r.x, r.y - 1), cv::FONT_HERSHEY_PLAIN, 1.2, cv::Scalar(0xFF, 0xFF, 0xFF), 2);
+    }
 }
 
 static cv::Rect get_downscale_rect(float bbox[4], float scale) {
