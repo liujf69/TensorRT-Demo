@@ -1,3 +1,11 @@
+/*
+    ./yolov5_seg -s ../yolov5/weights/yolov5s-seg.wts ./yolov5s-seg.engine s
+    wget -O coco.txt https://raw.githubusercontent.com/amikelive/coco-labels/master/coco-labels-2014_2017.txt
+    ./yolov5_seg -d yolov5s-seg.engine -i ../images/test1.jpg coco.txt
+    ./yolov5_seg -d yolov5s-seg.engine -v ../videos/test1.avi coco.txt
+    ./yolov5_seg -d yolov5s-seg.engine -c 0 coco.txt
+*/
+
 #include "config.h"
 #include "cuda_utils.h"
 #include "logging.h"
