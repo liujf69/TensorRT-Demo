@@ -29,5 +29,5 @@ make
 ./Infer_Onnx -d ./Dynamics_InputNet.engine
 ```
 # Comparison
-
+![image](https://github.com/liujf69/TensorRT-Demo/blob/master/TRT_Dynamic_Input/Comparison.png)
 
