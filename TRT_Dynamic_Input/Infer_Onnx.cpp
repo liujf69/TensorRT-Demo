@@ -11,8 +11,8 @@
 
 using namespace nvinfer1;
 
-static const int total_size = 1 * 3 * 256 * 256; // 大小
-static const int output_size = 1 * 256 * 256 * 256;
+static const int total_size = 2 * 3 * 256 * 256; // 大小
+static const int output_size = 2 * 256 * 256 * 256;
 
 // 继承 ILogger 类型创建自己的Logger
 class Logger : public nvinfer1::ILogger{
@@ -116,7 +116,7 @@ void Infer_onnx::deserialize_and_infer(std::string engine_path, float* input_dat
     assert(engine != nullptr);
 
     IExecutionContext *context = engine->createExecutionContext(); // 创建context
-    context->setBindingDimensions(0, Dims4(1, 3, 256, 256)); // 这步非常重要，要为动态维度设置具体的数值，否则输出结果会是全零
+    context->setBindingDimensions(0, Dims4(2, 3, 256, 256)); // 这步非常重要，要为动态维度设置具体的数值，否则输出结果会是全零
     assert(context != nullptr);
 
     auto start = std::chrono::system_clock::now(); // 记录推理时长
@@ -187,11 +187,10 @@ int main(int argc, char* argv[]){
         // 序列化并推理
         Infer_demo.deserialize_and_infer(engine_path, input_data, output_data, total_size);
       
-        // 打印第一个数据，验证推理结果，可以与python版本的对照来验证
-        for(int i = 0; i < 1; i++){
-            std::cout << output_data[i] << std::endl; 
-        }
         std::cout << "deserialize successfully" << std::endl;
+
+        // 打印第一个数据，验证推理结果，可以与python版本的对照来验证
+        std::cout << "Test Result: " << output_data[0] << std::endl; 
     }
     else{
         std::cerr << "input wrong" << std::endl;
