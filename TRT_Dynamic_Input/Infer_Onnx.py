@@ -11,7 +11,7 @@ def get_parser():
     parser.add_argument(
         '--b',
         type = int,
-        default = 4)
+        default = 2)
     parser.add_argument(
         '--c',
         type = int,
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     Channel = args.c
     Height = args.h
     Width = args.w
-    input_data = torch.rand((Batch_size, Channel, Height, Width))
+    input_data = torch.ones((Batch_size, Channel, Height, Width))
     
     # 前处理
     input_data = preprocess(input_data)
@@ -160,5 +160,6 @@ if __name__ == "__main__":
     stream.synchronize()
     
     # 后处理
+    print("Test Result: ", output_buffer[0]) # 对比CPP版本
     output_data = postprocess(output_buffer)
     print("output.shape is : ", output_data.shape)
