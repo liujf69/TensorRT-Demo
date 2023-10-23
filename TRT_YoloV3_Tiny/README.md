@@ -4,6 +4,7 @@
 ```bash
 git clone -b archive https://github.com/ultralytics/yolov3.git
 mv gen_wts.py ./yolov3
+cd yolov3
 wget -c https://pjreddie.com/media/files/yolov3-tiny.weights
 python gen_wts.py yolov3-tiny.weights
 ```
@@ -14,7 +15,7 @@ mkdir build && cd build
 cmake ..
 make
 # serialize
-./yolov3-tiny_demo -s
+./yolov3-tiny_demo -s ../yolov3/yolov3-tiny.wts
 # deserialize
 ./yolov3-tiny_demo -d ../sample/bus.jpg
 ```

@@ -32,8 +32,8 @@ static Logger gLogger;
 
 class Yolov3_Tiny{
 public:
-    bool serialize(unsigned int maxBatchSize, std::string save_engine_path);
-    nvinfer1::ICudaEngine* createEngine(unsigned int maxBatchSize, nvinfer1::IBuilder* builder, nvinfer1::IBuilderConfig* config, nvinfer1::DataType dt);
+    bool serialize(unsigned int maxBatchSize, std::string save_engine_path, std::string weight_path);
+    nvinfer1::ICudaEngine* createEngine(unsigned int maxBatchSize, nvinfer1::IBuilder* builder, nvinfer1::IBuilderConfig* config, nvinfer1::DataType dt, std::string weight_path);
     std::map<std::string, nvinfer1::Weights> loadWeights(const std::string file);
     nvinfer1::ILayer* convBnLeaky(nvinfer1::INetworkDefinition *network, std::map<std::string, nvinfer1::Weights>& weightMap, nvinfer1::ITensor& input, int outch, int ksize, int s, int p, int linx);
     nvinfer1::IScaleLayer* addBatchNorm2d(nvinfer1::INetworkDefinition *network, std::map<std::string, nvinfer1::Weights>& weightMap, nvinfer1::ITensor& input, std::string lname, float eps);
@@ -41,14 +41,14 @@ public:
     void doInference(nvinfer1::IExecutionContext& context, float* input, float* output, int batchSize);
 };
 
-bool Yolov3_Tiny::serialize(unsigned int maxBatchSize, std::string save_engine_path){
+bool Yolov3_Tiny::serialize(unsigned int maxBatchSize, std::string save_engine_path, std::string weight_path){
     nvinfer1::IHostMemory* modelStream{nullptr};
     // 创建builder和config
     nvinfer1::IBuilder* builder = nvinfer1::createInferBuilder(gLogger);
     nvinfer1::IBuilderConfig* config = builder->createBuilderConfig();
 
     // 调用createEngine()函数创建engine
-    nvinfer1::ICudaEngine* engine = createEngine(maxBatchSize, builder, config, nvinfer1::DataType::kFLOAT);
+    nvinfer1::ICudaEngine* engine = createEngine(maxBatchSize, builder, config, nvinfer1::DataType::kFLOAT, weight_path);
     assert(engine != nullptr);
 
     // 序列化
@@ -71,9 +71,9 @@ bool Yolov3_Tiny::serialize(unsigned int maxBatchSize, std::string save_engine_p
 }
 
 // 使用API搭建engine
-nvinfer1::ICudaEngine* Yolov3_Tiny::createEngine(unsigned int maxBatchSize, nvinfer1::IBuilder* builder, nvinfer1::IBuilderConfig* config, nvinfer1::DataType dt) {
+nvinfer1::ICudaEngine* Yolov3_Tiny::createEngine(unsigned int maxBatchSize, nvinfer1::IBuilder* builder, nvinfer1::IBuilderConfig* config, nvinfer1::DataType dt, std::string weight_path) {
     // 加载权重文件
-    std::map<std::string, nvinfer1::Weights> weightMap = this->loadWeights("../yolov3-tiny.wts");
+    std::map<std::string, nvinfer1::Weights> weightMap = this->loadWeights(weight_path);
     nvinfer1::Weights emptywts{nvinfer1::DataType::kFLOAT, nullptr, 0};
     
     // 创建一个空的network
@@ -339,9 +339,10 @@ void Yolov3_Tiny::doInference(nvinfer1::IExecutionContext& context, float* input
 
 int main(int argc, char *argv[]){
     Yolov3_Tiny yolov3_demo;
-    if(argc == 2 && std::string(argv[1]) == "-s"){ // 序列化
+    if(argc == 3 && std::string(argv[1]) == "-s"){ // 序列化
         std::string save_engine_path = "yolov3-tiny.engine";
-        yolov3_demo.serialize(1, save_engine_path);
+        std::string weight_path = std::string(argv[2]);
+        yolov3_demo.serialize(1, save_engine_path, weight_path);
         return 0;
     }
     else if (argc == 3 && std::string(argv[1]) == "-d"){
@@ -352,7 +353,7 @@ int main(int argc, char *argv[]){
     }
     else{
         std::cerr << "arguments not right!" << std::endl;
-        std::cerr << "./yolov3-tiny_demo -s  // serialize model to plan file" << std::endl;
+        std::cerr << "./yolov3-tiny_demo -s ../yolov3/yolov3-tiny.wts  // serialize model to plan file" << std::endl;
         std::cerr << "./yolov3-tiny_demo -d ../sample/bus.jpg  // deserialize plan file and run inference" << std::endl;
         return -1;
     }
