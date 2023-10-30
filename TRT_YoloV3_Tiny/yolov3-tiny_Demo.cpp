@@ -127,11 +127,11 @@ nvinfer1::ICudaEngine* Yolov3_Tiny::createEngine(unsigned int maxBatchSize, nvin
     nvinfer1::IConvolutionLayer* conv22 = network->addConvolutionNd(*lr21->getOutput(0), 3 * (Yolo::CLASS_NUM + 5), nvinfer1::DimsHW{1, 1}, weightMap["module_list.22.Conv2d.weight"], weightMap["module_list.22.Conv2d.bias"]);
     // 22 is yolo
 
-    auto creator = getPluginRegistry()->getPluginCreator("YoloLayer_TRT", "1");
+    auto creator = getPluginRegistry()->getPluginCreator("YoloLayer_TRT", "1"); // 查找插件
     const nvinfer1::PluginFieldCollection* pluginData = creator->getFieldNames();
-    nvinfer1::IPluginV2 *pluginObj = creator->createPlugin("yololayer", pluginData);
+    nvinfer1::IPluginV2 *pluginObj = creator->createPlugin("yololayer", pluginData); // 创建插件实例
     nvinfer1::ITensor* inputTensors_yolo[] = {conv15->getOutput(0), conv22->getOutput(0)};
-    auto yolo = network->addPluginV2(inputTensors_yolo, 2, *pluginObj);
+    auto yolo = network->addPluginV2(inputTensors_yolo, 2, *pluginObj); // 将插件添加到 network 中
 
     yolo->getOutput(0)->setName(OUTPUT_BLOB_NAME);
     network->markOutput(*yolo->getOutput(0));

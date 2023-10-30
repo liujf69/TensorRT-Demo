@@ -159,16 +159,15 @@ namespace nvinfer1{
     void YoloLayerPlugin::forwardGpu(const float *const * inputs, float* output, cudaStream_t stream, int batchSize) {
         void* devAnchor;
         size_t AnchorLen = sizeof(float)* CHECK_COUNT*2;
-        CUDA_CHECK(cudaMalloc(&devAnchor,AnchorLen));
+        CUDA_CHECK(cudaMalloc(&devAnchor, AnchorLen));
 
         int outputElem = 1 + MAX_OUTPUT_BBOX_COUNT * sizeof(Detection) / sizeof(float);
 
-        for(int idx = 0 ; idx < batchSize; ++idx) {
+        for(int idx = 0 ; idx < batchSize; ++idx){
             CUDA_CHECK(cudaMemset(output + idx*outputElem, 0, sizeof(float)));
         }
         int numElem = 0;
-        for (unsigned int i = 0;i< mYoloKernel.size();++i)
-        {
+        for (unsigned int i = 0;i< mYoloKernel.size();++i){
             const auto& yolo = mYoloKernel[i];
             numElem = yolo.width*yolo.height*batchSize;
             if (numElem < mThreadCount)

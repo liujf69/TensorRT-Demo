@@ -6,7 +6,6 @@
 #include "NvInfer.h"
 #include "macros.h"
 
-
 namespace Yolo{
     static constexpr int CHECK_COUNT = 3;
     static constexpr float IGNORE_THRESH = 0.1f;
@@ -41,7 +40,6 @@ namespace Yolo{
         float class_confidence;
     };
 }
-
 
 namespace nvinfer1{
     class YoloLayerPlugin: public IPluginV2IOExt{ // 继承 IPluginV2IOExt 类实现一个 Plugin 类
