@@ -4,25 +4,19 @@
 
 using namespace Yolo;
 
-namespace nvinfer1
-{
-    YoloLayerPlugin::YoloLayerPlugin()
-    {
+namespace nvinfer1{
+    YoloLayerPlugin::YoloLayerPlugin(){ // 默认构造函数
         mClassCount = CLASS_NUM;
         mYoloKernel.clear();
         mYoloKernel.push_back(yolo1);
         mYoloKernel.push_back(yolo2);
-
         mKernelCount = mYoloKernel.size();
     }
     
-    YoloLayerPlugin::~YoloLayerPlugin()
-    {
-    }
+    YoloLayerPlugin::~YoloLayerPlugin(){} // 析构函数
 
     // create the plugin at runtime from a byte stream
-    YoloLayerPlugin::YoloLayerPlugin(const void* data, size_t length)
-    {
+    YoloLayerPlugin::YoloLayerPlugin(const void* data, size_t length){ // 构造函数
         using namespace Tn;
         const char *d = reinterpret_cast<const char *>(data), *a = d;
         read(d, mClassCount);
@@ -32,12 +26,10 @@ namespace nvinfer1
         auto kernelSize = mKernelCount*sizeof(YoloKernel);
         memcpy(mYoloKernel.data(),d,kernelSize);
         d += kernelSize;
-
         assert(d == a + length);
     }
 
-    void YoloLayerPlugin::serialize(void* buffer) const TRT_NOEXCEPT
-    {
+    void YoloLayerPlugin::serialize(void* buffer) const TRT_NOEXCEPT{ // 序列化
         using namespace Tn;
         char* d = static_cast<char*>(buffer), *a = d;
         write(d, mClassCount);
@@ -46,87 +38,72 @@ namespace nvinfer1
         auto kernelSize = mKernelCount*sizeof(YoloKernel);
         memcpy(d,mYoloKernel.data(),kernelSize);
         d += kernelSize;
-
         assert(d == a + getSerializationSize());
     }
     
-    size_t YoloLayerPlugin::getSerializationSize() const TRT_NOEXCEPT
-    {  
+    size_t YoloLayerPlugin::getSerializationSize() const TRT_NOEXCEPT{  
         return sizeof(mClassCount) + sizeof(mThreadCount) + sizeof(mKernelCount)  + sizeof(Yolo::YoloKernel) * mYoloKernel.size();
     }
 
-    int YoloLayerPlugin::initialize() TRT_NOEXCEPT
-    { 
+    int YoloLayerPlugin::initialize() TRT_NOEXCEPT{ // 初始化函数，一般用来提前开辟空间
         return 0;
     }
-    
-    Dims YoloLayerPlugin::getOutputDimensions(int index, const Dims* inputs, int nbInputDims) TRT_NOEXCEPT
-    {
+
+    // getOutputDimensions() 向 TensorRT 报告输出张量的型状
+    Dims YoloLayerPlugin::getOutputDimensions(int index, const Dims* inputs, int nbInputDims) TRT_NOEXCEPT{
         //output the result to channel
         int totalsize = MAX_OUTPUT_BBOX_COUNT * sizeof(Detection) / sizeof(float);
-
         return Dims3(totalsize + 1, 1, 1);
     }
 
     // Set plugin namespace
-    void YoloLayerPlugin::setPluginNamespace(const char* pluginNamespace) TRT_NOEXCEPT
-    {
+    void YoloLayerPlugin::setPluginNamespace(const char* pluginNamespace) TRT_NOEXCEPT{
         mPluginNamespace = pluginNamespace;
     }
 
-    const char* YoloLayerPlugin::getPluginNamespace() const TRT_NOEXCEPT
-    {
+    const char* YoloLayerPlugin::getPluginNamespace() const TRT_NOEXCEPT{
         return mPluginNamespace;
     }
 
-    // Return the DataType of the plugin output at the requested index
-    DataType YoloLayerPlugin::getOutputDataType(int index, const nvinfer1::DataType* inputTypes, int nbInputs) const TRT_NOEXCEPT
-    {
+    // Return the DataType of the plugin output at the requested index // 返回结果的类型
+    DataType YoloLayerPlugin::getOutputDataType(int index, const nvinfer1::DataType* inputTypes, int nbInputs) const TRT_NOEXCEPT{
         return DataType::kFLOAT;
     }
 
     // Return true if output tensor is broadcast across a batch.
-    bool YoloLayerPlugin::isOutputBroadcastAcrossBatch(int outputIndex, const bool* inputIsBroadcasted, int nbInputs) const TRT_NOEXCEPT
-    {
+    bool YoloLayerPlugin::isOutputBroadcastAcrossBatch(int outputIndex, const bool* inputIsBroadcasted, int nbInputs) const TRT_NOEXCEPT{
         return false;
     }
 
     // Return true if plugin can use input that is broadcast across batch without replication.
-    bool YoloLayerPlugin::canBroadcastInputAcrossBatch(int inputIndex) const TRT_NOEXCEPT
-    {
+    bool YoloLayerPlugin::canBroadcastInputAcrossBatch(int inputIndex) const TRT_NOEXCEPT{
         return false;
     }
 
-    void YoloLayerPlugin::configurePlugin(const PluginTensorDesc* in, int nbInput, const PluginTensorDesc* out, int nbOutput) TRT_NOEXCEPT
-    {
+    void YoloLayerPlugin::configurePlugin(const PluginTensorDesc* in, int nbInput, const PluginTensorDesc* out, int nbOutput) TRT_NOEXCEPT{
     }
 
     // Attach the plugin object to an execution context and grant the plugin the access to some context resource.
-    void YoloLayerPlugin::attachToContext(cudnnContext* cudnnContext, cublasContext* cublasContext, IGpuAllocator* gpuAllocator) TRT_NOEXCEPT
-    {
+    void YoloLayerPlugin::attachToContext(cudnnContext* cudnnContext, cublasContext* cublasContext, IGpuAllocator* gpuAllocator) TRT_NOEXCEPT{
     }
 
     // Detach the plugin object from its execution context.
     void YoloLayerPlugin::detachFromContext() TRT_NOEXCEPT {}
 
-    const char* YoloLayerPlugin::getPluginType() const TRT_NOEXCEPT
-    {
+    const char* YoloLayerPlugin::getPluginType() const TRT_NOEXCEPT{
         return "YoloLayer_TRT";
     }
 
-    const char* YoloLayerPlugin::getPluginVersion() const TRT_NOEXCEPT
-    {
+    const char* YoloLayerPlugin::getPluginVersion() const TRT_NOEXCEPT{ // 返回 plugin 的版本
         return "1";
     }
 
-    void YoloLayerPlugin::destroy() TRT_NOEXCEPT
-    {
+    void YoloLayerPlugin::destroy() TRT_NOEXCEPT{
         delete this;
     }
 
     // Clone the plugin
-    IPluginV2IOExt* YoloLayerPlugin::clone() const TRT_NOEXCEPT
-    {
+    IPluginV2IOExt* YoloLayerPlugin::clone() const TRT_NOEXCEPT{ // 克隆plugin，将plugin对象克隆一份给TensorRT的builder、network和engine
         YoloLayerPlugin *p = new YoloLayerPlugin();
         p->setPluginNamespace(mPluginNamespace);
         return p;
@@ -204,14 +181,12 @@ namespace nvinfer1
         CUDA_CHECK(cudaFree(devAnchor));
     }
 
-
-    int YoloLayerPlugin::enqueue(int batchSize, const void*const * inputs, void*TRT_CONST_ENQUEUE* outputs, void* workspace, cudaStream_t stream) TRT_NOEXCEPT
-    {
+    // 实际 plugin 执行的操作，一般是调用 CUDA 核函数
+    int YoloLayerPlugin::enqueue(int batchSize, const void*const * inputs, void*TRT_CONST_ENQUEUE* outputs, void* workspace, cudaStream_t stream) TRT_NOEXCEPT{
         //assert(batchSize == 1);
         //GPU
         //CUDA_CHECK(cudaStreamSynchronize(stream));
         forwardGpu((const float *const *)inputs, (float*)outputs[0], stream, batchSize);
-
         return 0;
     }
 
